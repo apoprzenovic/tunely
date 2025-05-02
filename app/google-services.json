@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "188605773813",
+    "project_id": "rit-tunely",
+    "storage_bucket": "rit-tunely.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188605773813:android:739e62030de418484092bc",
+        "android_client_info": {
+          "package_name": "com.rit.tunely"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdvfJTTcZxxdEhlm_1-yfri__dZJKUD44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
