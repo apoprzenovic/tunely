@@ -27,7 +27,7 @@ fun HintDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Hint:") },
-        text = { Text("Guess the title based on the 30 second preview of song playing.") },
+        text = { Text("Guess the title based on the 30 second preview of the song playing.") },
         confirmButton = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
