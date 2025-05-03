@@ -26,7 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.rit.tunely.components.AnimatedColorButton
 import com.rit.tunely.navigation.TunelyDestinations
-import com.rit.tunely.ui.screens.game.Purple200
+import com.rit.tunely.ui.theme.Purple200
 
 @Composable
 fun LoginScreen(

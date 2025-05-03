@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.rit.tunely.components.AnimatedColorButton
-import com.rit.tunely.ui.screens.game.PastelGreen
-import com.rit.tunely.ui.screens.game.PastelRed
+import com.rit.tunely.ui.theme.PastelGreen
+import com.rit.tunely.ui.theme.PastelRed
 
 @Composable
 fun HintDialog(

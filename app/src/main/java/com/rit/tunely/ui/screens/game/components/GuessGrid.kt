@@ -21,11 +21,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rit.tunely.data.state.GameUiState
-import com.rit.tunely.ui.screens.game.BackgroundGray
-import com.rit.tunely.ui.screens.game.BorderGray
-import com.rit.tunely.ui.screens.game.PastelGray
-import com.rit.tunely.ui.screens.game.PastelGreen
-import com.rit.tunely.ui.screens.game.PastelYellow
+import com.rit.tunely.ui.theme.BackgroundGray
+import com.rit.tunely.ui.theme.BorderGray
+import com.rit.tunely.ui.theme.PastelGray
+import com.rit.tunely.ui.theme.PastelGreen
+import com.rit.tunely.ui.theme.PastelYellow
 import com.rit.tunely.util.Constants
 
 enum class LetterStatus {

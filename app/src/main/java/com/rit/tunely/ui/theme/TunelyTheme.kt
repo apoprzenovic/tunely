@@ -17,6 +17,15 @@ onBackground = Color(0xFF1C1B1F),
 onSurface = Color(0xFF1C1B1F),
 */
 
+
+val PastelGreen = Color(0xFFAEFFD0)
+val PastelYellow = Color(0xFFFFFC9C)
+val PastelGray = Color(0xFFD3D3D3)
+val BackgroundGray = Color(0xFFBDBDBD)
+val BorderGray = Color(0xFFBDBDBD)
+val PastelRed = Color(0xFFFFD1D1)
+val Purple200 = Color(0xFFBB86FC)
+
 val md_theme_light_primary = Color(0xFF6750A4)
 val md_theme_light_onPrimary = Color.White
 val md_theme_light_primaryContainer = Color(0xFFEADDFF)

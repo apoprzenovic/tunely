@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rit.tunely.ui.screens.game.BackgroundGray
+import com.rit.tunely.ui.theme.BackgroundGray
 
 @Composable
 fun OnScreenKeyboard(

@@ -29,8 +29,8 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.rit.tunely.components.AnimatedColorButton
 import com.rit.tunely.navigation.TunelyDestinations
-import com.rit.tunely.ui.screens.game.PastelGreen
-import com.rit.tunely.ui.screens.game.PastelRed
+import com.rit.tunely.ui.theme.PastelGreen
+import com.rit.tunely.ui.theme.PastelRed
 
 @Composable
 fun ProfileScreen(
