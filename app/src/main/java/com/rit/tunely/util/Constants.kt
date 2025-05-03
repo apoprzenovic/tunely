@@ -1,8 +1,8 @@
 package com.rit.tunely.util
 
 object Constants {
-    const val SPOTIFY_BASE_AUTH_URL = "https://accounts.spotify.com/"
-    const val SPOTIFY_BASE_URL = "https://api.spotify.com/"
+    const val ITUNES_BASE_URL = "https://itunes.apple.com/"
     const val TRACK_LIMIT = 1
     const val GUESSES_TOTAL = 6
+    const val ITUNES_MAX_OFFSET = 200
 }
