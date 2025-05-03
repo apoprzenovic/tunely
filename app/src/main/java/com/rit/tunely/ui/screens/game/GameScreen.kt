@@ -37,13 +37,13 @@ import com.rit.tunely.ui.screens.game.components.GuessGrid
 import com.rit.tunely.ui.screens.game.components.HintDialog
 import com.rit.tunely.ui.screens.game.components.OnScreenKeyboard
 
-// Color definitions
 val PastelGreen = Color(0xFFAEFFD0)
 val PastelYellow = Color(0xFFFFFC9C)
 val PastelGray = Color(0xFFD3D3D3)
 val BackgroundGray = Color(0xFFBDBDBD)
 val BorderGray = Color(0xFFBDBDBD)
 val PastelRed = Color(0xFFFFD1D1)
+val Purple200 = Color(0xFFBB86FC)
 
 @Composable
 fun GameScreen(
@@ -52,20 +52,19 @@ fun GameScreen(
 ) {
     var showGameContent by remember { mutableStateOf(false) }
     val state by vm.state.collectAsState()
-    var showHintDialog by remember { mutableStateOf(false) } // State for hint dialog
+    var showHintDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Top Row (Hint Icon and Title)
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = { showHintDialog = true }) { // Show hint dialog on click
+            IconButton(onClick = { showHintDialog = true }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
                     contentDescription = "Hint",
@@ -89,14 +88,12 @@ fun GameScreen(
         Spacer(Modifier.height(8.dp))
         HorizontalDivider(color = Color.Gray.copy(alpha = 0.5f))
 
-        // Content Area: Either Play Button or Game Grid + Keyboard
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             if (!showGameContent) {
-                // Initial Screen: Play Button centered
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -117,29 +114,26 @@ fun GameScreen(
                     }
                 }
             } else {
-                // Game Content Area
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .weight(1f)
                         .padding(top = 16.dp)
                 ) {
-                    // Loading/Error/Grid display logic remains the same...
                     if (state.isLoading) {
                         Text("Loading track...")
-                    } else if (state.error != null && !state.gameFinished) { // Only show loading error if game not finished
+                    } else if (state.error != null && !state.gameFinished) {
                         Text(state.error!!, color = MaterialTheme.colorScheme.error)
                     } else if (state.track != null) {
                         GuessGrid(
                             state = state,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
-                    } else if (!state.isLoading && !state.gameFinished) { // Handle case where track is null but not loading/error/finished
+                    } else if (!state.isLoading && !state.gameFinished) {
                         Text("Could not load track details.")
                     }
                 }
 
-                // Keyboard Area (only shown when game is active and not finished)
                 if (state.track != null && !state.gameFinished && state.error == null) {
                     OnScreenKeyboard(
                         onCharClick = { char -> vm.appendToGuess(char) },
@@ -147,27 +141,24 @@ fun GameScreen(
                         onBackspaceClick = { vm.deleteLastChar() },
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                } else if (showGameContent) { // Keep space if game content is shown but keyboard isn't
-                    Spacer(Modifier.height(50.dp)) // Adjust height as needed
+                } else if (showGameContent) {
+                    Spacer(Modifier.height(50.dp))
                 }
             }
         }
     }
 
-    // --- Dialogs ---
-    // Display Hint Dialog when showHintDialog is true
     if (showHintDialog) {
         HintDialog(onDismiss = { showHintDialog = false })
     }
 
-    // Display Game End Dialog when gameFinished is true
     if (state.gameFinished) {
         GameEndDialog(
             gameWon = state.gameWon,
+            pointsEarned = state.pointsEarnedThisRound,
             onContinue = {
-                vm.resetGame() // Reset ViewModel state
-                showGameContent = false // Go back to showing the play button
-                // Reset any local screen state if necessary
+                vm.resetGame()
+                showGameContent = false
             }
         )
     }
