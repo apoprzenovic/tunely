@@ -2,9 +2,9 @@ package com.rit.tunely.ui.screens.main
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Leaderboard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -33,17 +33,17 @@ fun MainScreen(parentNavController: NavController) {
         NavigationItem(
             route = TunelyDestinations.GAME.name,
             title = "Game",
-            icon = Icons.Default.PlayArrow
+            icon = Icons.Filled.MusicNote
         ),
         NavigationItem(
             route = TunelyDestinations.LEADERBOARD.name,
             title = "Leaderboard",
-            icon = Icons.Default.Menu
+            icon = Icons.Rounded.Leaderboard
         ),
         NavigationItem(
             route = TunelyDestinations.PROFILE.name,
             title = "Profile",
-            icon = Icons.Default.Person
+            icon = Icons.Rounded.AccountCircle
         )
     )
 
