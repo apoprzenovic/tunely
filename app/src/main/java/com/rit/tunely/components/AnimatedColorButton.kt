@@ -1,6 +1,7 @@
 package com.rit.tunely.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.height
@@ -20,7 +21,9 @@ fun AnimatedColorButton(
     baseColor: Color,
     textColor: Color = Color.White,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    enabled: Boolean = true,
+    borderStroke: BorderStroke = BorderStroke(1.dp, Color.Transparent),
+    onClick: () -> Unit,
 ) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
@@ -35,6 +38,8 @@ fun AnimatedColorButton(
         onClick = onClick,
         modifier = modifier.height(48.dp),
         interactionSource = interaction,
-        colors = ButtonDefaults.buttonColors(containerColor = animatedColor)
+        colors = ButtonDefaults.buttonColors(containerColor = animatedColor),
+        enabled = enabled,
+        border = borderStroke,
     ) { Text(text = text, color = textColor) }
 }
