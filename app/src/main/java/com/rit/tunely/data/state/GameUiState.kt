@@ -10,5 +10,6 @@ data class GameUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val gameFinished: Boolean = false,
-    val gameWon: Boolean = false
+    val gameWon: Boolean = false,
+    val pointsEarnedThisRound: Int? = null
 )
