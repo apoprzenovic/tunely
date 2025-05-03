@@ -2,6 +2,7 @@ package com.rit.tunely.data.repository
 
 import com.rit.tunely.data.model.Track
 import com.rit.tunely.data.remote.ITunesApi
+import com.rit.tunely.data.remote.dto.SongDto
 import com.rit.tunely.data.remote.dto.toDomain
 import com.rit.tunely.util.Constants
 import com.rit.tunely.util.Resource
@@ -17,28 +18,32 @@ class ITunesRepository @Inject constructor(
 ) {
     private val searchChars = ('a'..'z').toList()
 
-    suspend fun getRandomTrackWithPreview(maxRetries: Int = 2): Resource<Track> = withContext(Dispatchers.IO) {
+    suspend fun getRandomTrackWithPreview(
+        maxRetries: Int = 2
+    ): Resource<Track> = withContext(Dispatchers.IO) {
         repeat(maxRetries + 1) { attempt ->
-            try {
-                val randomChar = searchChars.random().toString()
-                val randomOffset = Random.nextInt(Constants.ITUNES_MAX_OFFSET + 1)
-
-                api.searchSong(randomChar, randomOffset)
-                    .results
-                    .firstOrNull()
-                    ?.toDomain()
-                    ?.let { return@withContext Resource.Success(it) }
-            } catch (e: HttpException) {
-                if (attempt < maxRetries) return@repeat
-                return@withContext Resource.Error(
-                    "iTunes API Error: ${e.code()} – ${e.message()}"
-                )
-            } catch (e: IOException) {
-                return@withContext Resource.Error("Network Error: ${e.localizedMessage}")
-            } catch (e: Exception) {
-                return@withContext Resource.Error("Unexpected error: ${e.localizedMessage}")
+            val outcome = runCatching { fetchAndPick() }
+            outcome.getOrNull()?.let { return@withContext Resource.Success(it) }
+            if (attempt == maxRetries) {
+                val e = outcome.exceptionOrNull()
+                return@withContext when (e) {
+                    is HttpException -> Resource.Error("iTunes API Error: ${e.code()} – ${e.message()}")
+                    is IOException -> Resource.Error("Network Error: ${e.localizedMessage}")
+                    else -> Resource.Error(e?.localizedMessage ?: "Unexpected error")
+                }
             }
         }
-        Resource.Error("Could not find a track!")
+        Resource.Error("Could not find a suitable track!")
     }
+
+    private suspend fun fetchAndPick(): Track {
+        val term = searchChars.random().toString()
+        val offset = Random.nextInt(Constants.ITUNES_MAX_OFFSET + 1)
+        val batch = api.searchSong(term, offset).results
+        return pickCandidate(batch) ?: error("No <=9-char title in batch")
+    }
+
+    private fun pickCandidate(candidates: List<SongDto>): Track? = candidates
+        .mapNotNull { it.toDomain() }
+        .firstOrNull { it.title.length <= 9 }
 }

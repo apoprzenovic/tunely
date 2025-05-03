@@ -1,60 +1,174 @@
 package com.rit.tunely.ui.screens.game
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.PlayCircle
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.rit.tunely.ui.screens.game.components.GameEndDialog
+import com.rit.tunely.ui.screens.game.components.GuessGrid
+import com.rit.tunely.ui.screens.game.components.HintDialog
+import com.rit.tunely.ui.screens.game.components.OnScreenKeyboard
 
-@OptIn(ExperimentalMaterial3Api::class)
+// Color definitions
+val PastelGreen = Color(0xFFAEFFD0)
+val PastelYellow = Color(0xFFFFFC9C)
+val PastelGray = Color(0xFFD3D3D3)
+val BackgroundGray = Color(0xFFBDBDBD)
+val BorderGray = Color(0xFFBDBDBD)
+val PastelRed = Color(0xFFFFD1D1)
+
 @Composable
 fun GameScreen(
     nav: NavController,
     vm: GameViewModel = hiltViewModel()
 ) {
-    val state = vm.state.collectAsState().value
+    var showGameContent by remember { mutableStateOf(false) }
+    val state by vm.state.collectAsState()
+    var showHintDialog by remember { mutableStateOf(false) } // State for hint dialog
 
-    LaunchedEffect(Unit) {
-        vm.init()
-    }
-
-    Scaffold(topBar = { TopAppBar(title = { Text("Guess the Title") }) }) { padding ->
-        Column(
-            Modifier
-                .padding(padding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Top Row (Hint Icon and Title)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Tries left: ${state.attemptsLeft}")
-            Spacer(Modifier.height(16.dp))
-            Text(state.maskedTitle, style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(16.dp))
-            OutlinedTextField(
-                value = state.currentGuess,
-                onValueChange = vm::onGuessChange,
-                label = { Text("Your guess") }
-            )
-            Spacer(Modifier.height(8.dp))
-            Button(
-                enabled = state.currentGuess.isNotBlank(),
-                onClick = vm::submitGuess
-            ) { Text("Submit") }
-            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            IconButton(onClick = { showHintDialog = true }) { // Show hint dialog on click
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
+                    contentDescription = "Hint",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(0.dp, 0.dp, 25.dp, 0.dp), contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "TUNELY",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(Modifier.size(24.dp))
+        }
+
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.5f))
+
+        // Content Area: Either Play Button or Game Grid + Keyboard
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (!showGameContent) {
+                // Initial Screen: Play Button centered
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            showGameContent = true
+                            vm.loadTrack()
+                        },
+                        modifier = Modifier.size(120.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.PlayCircle,
+                            contentDescription = "Play Game",
+                            modifier = Modifier.fillMaxSize(),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            } else {
+                // Game Content Area
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 16.dp)
+                ) {
+                    // Loading/Error/Grid display logic remains the same...
+                    if (state.isLoading) {
+                        Text("Loading track...")
+                    } else if (state.error != null && !state.gameFinished) { // Only show loading error if game not finished
+                        Text(state.error!!, color = MaterialTheme.colorScheme.error)
+                    } else if (state.track != null) {
+                        GuessGrid(
+                            state = state,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    } else if (!state.isLoading && !state.gameFinished) { // Handle case where track is null but not loading/error/finished
+                        Text("Could not load track details.")
+                    }
+                }
+
+                // Keyboard Area (only shown when game is active and not finished)
+                if (state.track != null && !state.gameFinished && state.error == null) {
+                    OnScreenKeyboard(
+                        onCharClick = { char -> vm.appendToGuess(char) },
+                        onEnterClick = { vm.submitGuess() },
+                        onBackspaceClick = { vm.deleteLastChar() },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                } else if (showGameContent) { // Keep space if game content is shown but keyboard isn't
+                    Spacer(Modifier.height(50.dp)) // Adjust height as needed
+                }
+            }
         }
     }
-}
 
+    // --- Dialogs ---
+    // Display Hint Dialog when showHintDialog is true
+    if (showHintDialog) {
+        HintDialog(onDismiss = { showHintDialog = false })
+    }
+
+    // Display Game End Dialog when gameFinished is true
+    if (state.gameFinished) {
+        GameEndDialog(
+            gameWon = state.gameWon,
+            onContinue = {
+                vm.resetGame() // Reset ViewModel state
+                showGameContent = false // Go back to showing the play button
+                // Reset any local screen state if necessary
+            }
+        )
+    }
+}
