@@ -5,21 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.rit.tunely.data.model.User
 import com.rit.tunely.data.repository.AuthRepository
 import com.rit.tunely.data.repository.UserRepository
+import com.rit.tunely.data.state.SignUpUiState
 import com.rit.tunely.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class SignUpUiState(
-    val email: String = "",
-    val username: String = "",
-    val password: String = "",
-    val confirmPassword: String = "",
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
