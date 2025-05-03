@@ -27,8 +27,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.rit.tunely.components.AnimatedColorButton
 import com.rit.tunely.navigation.TunelyDestinations
+import com.rit.tunely.ui.components.AnimatedColorButton
+import com.rit.tunely.ui.components.ScreenTopBar
 import com.rit.tunely.ui.theme.PastelGreen
 import com.rit.tunely.ui.theme.PastelRed
 
@@ -48,67 +49,71 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(16.dp),
     ) {
+        ScreenTopBar(title = "Profile")
 
-        // Username + points
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                text = state.user.username.ifBlank { "Username not defined" },
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Points: ${state.user.points}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-        }
-
-        Text(
-            text = state.user.bio.ifBlank { "Bio not defined" },
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        // Bio editor
-        OutlinedTextField(
-            value = bioDraft,
-            onValueChange = { bioDraft = it },
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 3,
-            label = { Text("Bio") }
-        )
-
-        // Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            AnimatedColorButton(
-                text = "Save",
-                baseColor = PastelGreen,
-                textColor = Color.Black,
-                modifier = Modifier.weight(1f)
+            // Username + points
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                vm.updateBio(bioDraft)
-                vm.saveProfile()
+                Text(
+                    text = state.user.username.ifBlank { "Username not defined" },
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Points: ${state.user.points}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
             }
 
-            Spacer(Modifier.width(16.dp))
+            Text(
+                text = state.user.bio.ifBlank { "Bio not defined" },
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-            AnimatedColorButton(
-                text = "Log out",
-                baseColor = PastelRed,
-                textColor = Color.Black,
-                modifier = Modifier.weight(1f)
+            // Bio editor
+            OutlinedTextField(
+                value = bioDraft,
+                onValueChange = { bioDraft = it },
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 3,
+                label = { Text("Bio") }
+            )
+
+            // Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FirebaseAuth.getInstance().signOut()
-                nav.navigate(TunelyDestinations.LOGIN.name) {
-                    popUpTo(TunelyDestinations.PROFILE.name) { inclusive = true }
+                AnimatedColorButton(
+                    text = "Save",
+                    baseColor = PastelGreen,
+                    textColor = Color.Black,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    vm.updateBio(bioDraft)
+                    vm.saveProfile()
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                AnimatedColorButton(
+                    text = "Log out",
+                    baseColor = PastelRed,
+                    textColor = Color.Black,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    FirebaseAuth.getInstance().signOut()
+                    nav.navigate(TunelyDestinations.LOGIN.name) {
+                        popUpTo(TunelyDestinations.PROFILE.name) { inclusive = true }
+                    }
                 }
             }
         }

@@ -16,7 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.rit.tunely.components.AnimatedColorButton
+import com.rit.tunely.ui.components.AnimatedColorButton
 import com.rit.tunely.ui.theme.PastelGreen
 import com.rit.tunely.ui.theme.PastelRed
 

@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.rit.tunely.components.AnimatedColorButton
 import com.rit.tunely.navigation.TunelyDestinations
+import com.rit.tunely.ui.components.AnimatedColorButton
 import com.rit.tunely.ui.theme.Purple200
 
 @Composable

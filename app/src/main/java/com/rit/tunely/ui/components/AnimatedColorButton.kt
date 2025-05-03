@@ -1,4 +1,4 @@
-package com.rit.tunely.components
+package com.rit.tunely.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke

@@ -15,11 +15,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.rit.tunely.ui.components.ScreenTopBar
 import com.rit.tunely.ui.screens.leaderboard.components.LeaderboardItem
 
 @Composable
@@ -33,16 +32,9 @@ fun LeaderboardScreen(nav: NavController, vm: LeaderboardViewModel = hiltViewMod
     Column(
         Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(16.dp)
     ) {
-        Text(
-            "Leaderboard",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(vertical = 16.dp)
-        )
+        ScreenTopBar(title = "Leaderboard")
 
         when {
             state.isLoading -> {
