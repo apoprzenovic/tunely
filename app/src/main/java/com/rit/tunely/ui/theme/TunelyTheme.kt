@@ -25,6 +25,9 @@ val BackgroundGray = Color(0xFFBDBDBD)
 val BorderGray = Color(0xFFBDBDBD)
 val PastelRed = Color(0xFFFFD1D1)
 val Purple200 = Color(0xFFBB86FC)
+val Gold = Color(0xFFFFD54F)
+val Silver = Color(0xFFE0E0E0)
+val Bronze = Color(0xFFCD7F32)
 
 val md_theme_light_primary = Color(0xFF6750A4)
 val md_theme_light_onPrimary = Color.White
