@@ -1,4 +1,4 @@
-package com.rit.tunely.ui.screens.main
+package com.rit.tunely.ui.screens.main.components
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
