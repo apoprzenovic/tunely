@@ -10,7 +10,8 @@ class UserRepository @Inject constructor(private val db: FirebaseFirestore) {
     private val users get() = db.collection("users")
     suspend fun getUser(uid: String): Resource<User> = try {
         val snap = users.document(uid).get().await()
-        Resource.Success(snap.toObject(User::class.java) ?: User())
+        val user = snap.toObject(User::class.java)?.copy(uid = snap.id) ?: User(uid = uid)
+        Resource.Success(user)
     } catch (e: Exception) {
         Resource.Error(e.localizedMessage ?: "User fetch error")
     }
