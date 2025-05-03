@@ -48,6 +48,7 @@ fun HintDialog(
 fun GameEndDialog(
     gameWon: Boolean,
     pointsEarned: Int?,
+    trackTitle: String,
     onContinue: () -> Unit
 ) {
     val backgroundColor = if (gameWon) PastelGreen else PastelRed
@@ -59,7 +60,11 @@ fun GameEndDialog(
                 append("Earned Points: $pointsEarned")
             }
         } else {
-            append("You didn't manage to guess correctly, better luck next time!")
+            append("You didn't manage to guess correctly.")
+            append("\n")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("Song Title: $trackTitle")
+            }
         }
     }
 

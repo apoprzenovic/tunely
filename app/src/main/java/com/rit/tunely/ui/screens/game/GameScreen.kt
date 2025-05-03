@@ -55,6 +55,7 @@ fun GameScreen(
         GameEndDialog(
             gameWon = state.gameWon,
             pointsEarned = state.pointsEarnedThisRound,
+            trackTitle = state.track?.title ?: "Unknown Title",
             onContinue = { vm.resetGame(); playing = false }
         )
     }
