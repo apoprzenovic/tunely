@@ -1,17 +1,22 @@
 package com.rit.tunely.ui.screens.game.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.rit.tunely.components.AnimatedColorButton
 import com.rit.tunely.ui.screens.game.PastelGreen
 import com.rit.tunely.ui.screens.game.PastelRed
 
@@ -21,11 +26,19 @@ fun HintDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Hint") },
-        text = { Text("Guess the title!") },
+        title = { Text("Hint:") },
+        text = { Text("Guess the title based on the 30 second preview of song playing.") },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK")
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                AnimatedColorButton(
+                    text = "OK",
+                    onClick = onDismiss,
+                    baseColor = Color.White,
+                    textColor = Color.Black
+                )
             }
         }
     )
@@ -34,13 +47,20 @@ fun HintDialog(
 @Composable
 fun GameEndDialog(
     gameWon: Boolean,
+    pointsEarned: Int?,
     onContinue: () -> Unit
 ) {
     val backgroundColor = if (gameWon) PastelGreen else PastelRed
-    val message = if (gameWon) {
-        "Congratulations you've correctly guessed the title!"
-    } else {
-        "You didn't manage to guess correctly, better luck next time!"
+    val message = buildAnnotatedString {
+        if (gameWon) {
+            append("Congratulations you've correctly guessed the title!")
+            append("\n")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("Earned Points: $pointsEarned")
+            }
+        } else {
+            append("You didn't manage to guess correctly, better luck next time!")
+        }
     }
 
     AlertDialog(
@@ -54,9 +74,12 @@ fun GameEndDialog(
             ) {
                 Text(text = message, color = Color.Black)
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = onContinue) {
-                    Text("Continue")
-                }
+                AnimatedColorButton(
+                    text = "Continue",
+                    baseColor = Color.White,
+                    textColor = Color.Black,
+                    onClick = onContinue,
+                )
             }
         }
     )
