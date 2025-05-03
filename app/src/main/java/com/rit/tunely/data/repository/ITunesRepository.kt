@@ -1,5 +1,6 @@
 package com.rit.tunely.data.repository
 
+import android.util.Log
 import com.rit.tunely.data.model.Track
 import com.rit.tunely.data.remote.ITunesApi
 import com.rit.tunely.data.remote.dto.SongDto
@@ -16,6 +17,7 @@ import kotlin.random.Random
 class ITunesRepository @Inject constructor(
     private val api: ITunesApi
 ) {
+    private val TAG = "ITunesRepository"
     private val searchChars = ('a'..'z').toList()
 
     suspend fun getRandomTrackWithPreview(
@@ -23,7 +25,14 @@ class ITunesRepository @Inject constructor(
     ): Resource<Track> = withContext(Dispatchers.IO) {
         repeat(maxRetries + 1) { attempt ->
             val outcome = runCatching { fetchAndPick() }
-            outcome.getOrNull()?.let { return@withContext Resource.Success(it) }
+            outcome.getOrNull()?.let { track ->
+                Log.d(
+                    TAG,
+                    "Selected Track: Title='${track.title}', Artist='${track.artist}', ID='${track.id}', Preview='${track.previewUrl}'"
+                )
+                return@withContext Resource.Success(track)
+            }
+            
             if (attempt == maxRetries) {
                 val e = outcome.exceptionOrNull()
                 return@withContext when (e) {

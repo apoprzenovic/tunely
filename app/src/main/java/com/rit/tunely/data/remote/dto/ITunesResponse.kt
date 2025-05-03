@@ -1,6 +1,5 @@
 package com.rit.tunely.data.remote.dto
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.rit.tunely.data.model.Track
 import com.rit.tunely.util.sanitizeTitle
@@ -26,7 +25,6 @@ fun SongDto.toDomain(): Track? {
     }
 
     val cleanedTitle = sanitizeTitle(trackName)
-    Log.d("SongDto.toDomain", "Original Title: $trackName, Processed Title: $cleanedTitle")
 
     if (cleanedTitle.isBlank()) {
         return null
