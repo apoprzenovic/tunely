@@ -28,6 +28,7 @@ fun OnScreenKeyboard(
     onEnterClick: () -> Unit,
     onBackspaceClick: () -> Unit
 ) {
+    val row0 = "1234567890"
     val row1 = "QWERTYUIOP"
     val row2 = "ASDFGHJKL"
     val row3 = "ZXCVBNM"
@@ -39,6 +40,7 @@ fun OnScreenKeyboard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        KeyboardRow(row0, onCharClick)
         KeyboardRow(row1, onCharClick)
         KeyboardRow(row2, onCharClick)
         KeyboardRowWithSpecial(row3, onCharClick, onEnterClick, onBackspaceClick)
