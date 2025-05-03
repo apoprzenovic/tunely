@@ -27,7 +27,7 @@ import com.rit.tunely.ui.screens.profile.ProfileScreen
 
 @Composable
 fun MainScreen(parentNavController: NavController) {
-    val navController = rememberNavController()
+    val tabNavController = rememberNavController()
 
     val items = listOf(
         NavigationItem(
@@ -50,7 +50,7 @@ fun MainScreen(parentNavController: NavController) {
     Scaffold(
         bottomBar = {
             NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
                 items.forEach { item ->
@@ -59,8 +59,8 @@ fun MainScreen(parentNavController: NavController) {
                         label = { Text(item.title) },
                         selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                         onClick = {
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
+                            tabNavController.navigate(item.route) {
+                                popUpTo(tabNavController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
@@ -73,18 +73,18 @@ fun MainScreen(parentNavController: NavController) {
         }
     ) { innerPadding ->
         NavHost(
-            navController = navController,
+            navController = tabNavController,
             startDestination = TunelyDestinations.GAME.name,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(TunelyDestinations.GAME.name) {
-                GameScreen(navController)
+                GameScreen(tabNavController)
             }
             composable(TunelyDestinations.LEADERBOARD.name) {
-                LeaderboardScreen(navController)
+                LeaderboardScreen(tabNavController)
             }
             composable(TunelyDestinations.PROFILE.name) {
-                ProfileScreen(navController)
+                ProfileScreen(parentNavController)
             }
         }
     }
