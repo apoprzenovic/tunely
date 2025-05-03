@@ -3,6 +3,7 @@ package com.rit.tunely.data.remote.dto
 import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.rit.tunely.data.model.Track
+import com.rit.tunely.util.sanitizeTitle
 
 data class ITunesResponse(
     @SerializedName("resultCount") val resultCount: Int,
@@ -24,16 +25,16 @@ fun SongDto.toDomain(): Track? {
         return null
     }
 
-    val processedTitle = trackName.replace(Regex("\\s*\\(.*\\)"), "").trim()
-    Log.d("SongDto.toDomain", "Original Title: $trackName, Processed Title: $processedTitle")
+    val cleanedTitle = sanitizeTitle(trackName)
+    Log.d("SongDto.toDomain", "Original Title: $trackName, Processed Title: $cleanedTitle")
 
-    if (processedTitle.isBlank()) {
+    if (cleanedTitle.isBlank()) {
         return null
     }
 
     return Track(
         id = trackId.toString(),
-        title = processedTitle,
+        title = cleanedTitle,
         artist = artistName,
         previewUrl = previewUrl,
         artworkUrl = artworkUrl100 ?: artworkUrl60 ?: artworkUrl30
