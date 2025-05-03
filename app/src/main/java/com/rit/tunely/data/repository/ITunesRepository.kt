@@ -17,32 +17,28 @@ class ITunesRepository @Inject constructor(
 ) {
     private val searchChars = ('a'..'z').toList()
 
-    suspend fun getRandomTrackWithPreview(): Resource<Track> = withContext(Dispatchers.IO) {
-        try {
-            val randomChar = searchChars.random().toString()
-            val randomOffset = Random.nextInt(Constants.ITUNES_MAX_OFFSET + 1)
+    suspend fun getRandomTrackWithPreview(maxRetries: Int = 2): Resource<Track> = withContext(Dispatchers.IO) {
+        repeat(maxRetries + 1) { attempt ->
+            try {
+                val randomChar = searchChars.random().toString()
+                val randomOffset = Random.nextInt(Constants.ITUNES_MAX_OFFSET + 1)
 
-            val response = api.searchSong(
-                term = randomChar,
-                offset = randomOffset,
-                limit = 1
-            )
-
-            if (response.resultCount > 0) {
-                val trackDto = response.results.first()
-                val track = trackDto.toDomain()
-                if (track != null) {
-                    return@withContext Resource.Success(track)
-                }
+                api.searchSong(randomChar, randomOffset)
+                    .results
+                    .firstOrNull()
+                    ?.toDomain()
+                    ?.let { return@withContext Resource.Success(it) }
+            } catch (e: HttpException) {
+                if (attempt < maxRetries) return@repeat
+                return@withContext Resource.Error(
+                    "iTunes API Error: ${e.code()} – ${e.message()}"
+                )
+            } catch (e: IOException) {
+                return@withContext Resource.Error("Network Error: ${e.localizedMessage}")
+            } catch (e: Exception) {
+                return@withContext Resource.Error("Unexpected error: ${e.localizedMessage}")
             }
-        } catch (e: HttpException) {
-            return@withContext Resource.Error("iTunes API Error: ${e.code()} - ${e.message()}")
-        } catch (e: IOException) {
-            return@withContext Resource.Error("Network Error: ${e.localizedMessage}")
-        } catch (e: Exception) {
-            return@withContext Resource.Error("An unexpected error occurred: ${e.localizedMessage}")
         }
-
         Resource.Error("Could not find a track!")
     }
 }
