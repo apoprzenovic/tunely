@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.rit.tunely.navigation.TunelyDestinations
 import com.rit.tunely.ui.screens.game.GameScreen
 import com.rit.tunely.ui.screens.leaderboard.LeaderboardScreen
+import com.rit.tunely.ui.screens.main.components.NavigationItem
 import com.rit.tunely.ui.screens.profile.ProfileScreen
 
 @Composable
