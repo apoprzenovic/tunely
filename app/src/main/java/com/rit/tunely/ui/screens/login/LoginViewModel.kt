@@ -3,17 +3,13 @@ package com.rit.tunely.ui.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rit.tunely.data.repository.AuthRepository
+import com.rit.tunely.data.state.LoginUiState
 import com.rit.tunely.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class LoginUiState(
-    val email: String = "", val password: String = "",
-    val isLoading: Boolean = false, val error: String? = null
-)
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
