@@ -1,12 +1,3 @@
-import java.io.FileInputStream
-import java.util.Properties
-
-val localProps = Properties()
-val localPropsFile = rootProject.file("local.properties")
-if (localPropsFile.exists()) {
-    localProps.load(FileInputStream(localPropsFile))
-}
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -28,13 +19,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        val spotifyClientId = localProps.getProperty("spotify.clientId")
-        val spotifyClientSecret = localProps.getProperty("spotify.clientSecret")
-
-        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${spotifyClientId}\"")
-        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${spotifyClientSecret}\"")
-
     }
 
     buildTypes {
@@ -57,57 +41,56 @@ android {
 }
 
 dependencies {
-    // Existing dependencies kept as is
+    // Core & Concurrency
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.kotlinx.coroutines)
 
-    // Compose
+    // Jetpack Compose UI stack
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.tooling.preview)
     debugImplementation(libs.androidx.ui.tooling)
 
-    // ViewModel
+    // Architecture & Navigation
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    // Navigation
     implementation(libs.androidx.navigation.compose)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
+    // Dependency Injection (Hilt)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.compiler.ksp)
 
-    // Networking
+    // Networking / JSON
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
 
-    // ExoPlayer (Media3)
+    // Media playback (Media3 / ExoPlayer)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.exoplayer.hls)
     implementation(libs.media3.ui)
 
-    // Room
+    //Local data (Room)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
+    // Firebase (Auth & Firestore)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
+    //Images
     implementation(libs.coil)
 
-    implementation(libs.kotlinx.coroutines)
-
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler.ksp)
-    ksp(libs.room.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
 }
