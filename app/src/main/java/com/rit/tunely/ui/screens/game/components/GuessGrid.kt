@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,13 +38,15 @@ enum class LetterStatus {
     TYPING
 }
 
+private fun String.titleWithoutSpaces() = this.replace(" ", "")
+
 @Composable
 fun GuessGrid(
     state: GameUiState,
     modifier: Modifier = Modifier
 ) {
     val trackTitle = state.track?.title?.uppercase() ?: return
-    val titleLength = trackTitle.length
+    val titleWithoutSpaces = remember(trackTitle) { trackTitle.titleWithoutSpaces() }
     val totalGuesses = Constants.GUESSES_TOTAL
 
     Column(
@@ -56,10 +60,10 @@ fun GuessGrid(
             val currentInput = if (isCurrentAttemptRow) state.currentGuess.uppercase() else null
 
             GuessRow(
-                wordLength = titleLength,
+                originalTitle = trackTitle,
                 guess = guess,
                 currentInput = currentInput,
-                targetWord = trackTitle,
+                targetWordWithoutSpaces = titleWithoutSpaces,
                 isSubmitted = guess != null
             )
         }
@@ -68,35 +72,46 @@ fun GuessGrid(
 
 @Composable
 fun GuessRow(
-    wordLength: Int,
+    originalTitle: String,
     guess: String?,
     currentInput: String?,
-    targetWord: String,
+    targetWordWithoutSpaces: String,
     isSubmitted: Boolean
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        val letterStatuses = remember(guess, targetWord, isSubmitted) {
-            if (isSubmitted && guess != null) {
-                evaluateGuess(guess, targetWord)
-            } else {
-                List(wordLength) { LetterStatus.EMPTY }
-            }
+    val letterStatuses = remember(guess, targetWordWithoutSpaces, isSubmitted) {
+        if (isSubmitted && guess != null) {
+            evaluateGuess(guess, targetWordWithoutSpaces)
+        } else {
+            List(targetWordWithoutSpaces.length) { LetterStatus.EMPTY }
         }
+    }
 
-        for (colIndex in 0 until wordLength) {
-            val char = currentInput?.getOrNull(colIndex)
-                ?: guess?.getOrNull(colIndex)
-            val status = if (isSubmitted) {
-                letterStatuses.getOrElse(colIndex) { LetterStatus.EMPTY }
-            } else if (currentInput != null && colIndex < currentInput.length) {
-                LetterStatus.TYPING
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        var letterIndex = 0
+        for (colIndex in originalTitle.indices) {
+            val originalChar = originalTitle[colIndex]
+
+            if (originalChar == ' ') {
+                Spacer(Modifier.width(20.dp))
             } else {
-                LetterStatus.EMPTY
-            }
+                val char = currentInput?.getOrNull(letterIndex)
+                    ?: guess?.getOrNull(letterIndex)
 
-            LetterBox(char = char, status = status)
+                val status = if (isSubmitted) {
+                    letterStatuses.getOrElse(letterIndex) { LetterStatus.EMPTY }
+                } else if (currentInput != null && letterIndex < currentInput.length) {
+                    LetterStatus.TYPING
+                } else {
+                    LetterStatus.EMPTY
+                }
+
+                LetterBox(char = char, status = status)
+
+                letterIndex++
+            }
         }
     }
 }
@@ -111,7 +126,7 @@ fun LetterBox(char: Char?, status: LetterStatus) {
         LetterStatus.EMPTY -> BackgroundGray
     }
     val border = BorderStroke(1.dp, if (status == LetterStatus.EMPTY) BorderGray else Color.Transparent)
-    val textColor = if (status == LetterStatus.EMPTY || status == LetterStatus.TYPING) Color.Black else Color.Black
+    val textColor = Color.Black
 
     Box(
         modifier = Modifier
@@ -130,22 +145,20 @@ fun LetterBox(char: Char?, status: LetterStatus) {
     }
 }
 
-fun evaluateGuess(guess: String, targetWord: String): List<LetterStatus> {
-    val targetUpper = targetWord.uppercase()
-    val guessUpper = guess.uppercase()
-    val statuses = MutableList(targetUpper.length) { LetterStatus.ABSENT }
-    val targetLetterCounts = targetUpper.groupingBy { it }.eachCount().toMutableMap()
+fun evaluateGuess(guess: String, targetWordWithoutSpaces: String): List<LetterStatus> {
+    val statuses = MutableList(targetWordWithoutSpaces.length) { LetterStatus.ABSENT }
+    val targetLetterCounts = targetWordWithoutSpaces.groupingBy { it }.eachCount().toMutableMap()
 
-    for (i in targetUpper.indices) {
-        if (i < guessUpper.length && guessUpper[i] == targetUpper[i]) {
+    for (i in targetWordWithoutSpaces.indices) {
+        if (i < guess.length && guess[i] == targetWordWithoutSpaces[i]) {
             statuses[i] = LetterStatus.CORRECT
-            targetLetterCounts[targetUpper[i]] = targetLetterCounts.getOrDefault(targetUpper[i], 0) - 1
+            targetLetterCounts[targetWordWithoutSpaces[i]] = targetLetterCounts.getOrDefault(targetWordWithoutSpaces[i], 0) - 1
         }
     }
 
-    for (i in targetUpper.indices) {
-        if (statuses[i] != LetterStatus.CORRECT && i < guessUpper.length) {
-            val char = guessUpper[i]
+    for (i in targetWordWithoutSpaces.indices) {
+        if (statuses[i] != LetterStatus.CORRECT && i < guess.length) {
+            val char = guess[i]
             if (targetLetterCounts.getOrDefault(char, 0) > 0) {
                 statuses[i] = LetterStatus.PRESENT
                 targetLetterCounts[char] = targetLetterCounts.getOrDefault(char, 0) - 1

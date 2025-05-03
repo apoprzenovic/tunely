@@ -28,9 +28,17 @@ class GameViewModel @Inject constructor(
     private val _state = MutableStateFlow(GameUiState())
     val state: StateFlow<GameUiState> = _state
 
+    private fun String.titleWithoutSpaces() = this.replace(" ", "")
+
     fun appendToGuess(c: Char) = _state.update {
-        val title = it.track?.title ?: return
-        if (it.currentGuess.length < title.length) it.copy(currentGuess = it.currentGuess + c) else it
+        if (c == ' ') return@update it
+
+        val title = it.track?.title ?: return@update it
+        if (it.currentGuess.length < title.titleWithoutSpaces().length) {
+            it.copy(currentGuess = it.currentGuess + c)
+        } else {
+            it
+        }
     }
 
     fun deleteLastChar() = _state.update {
@@ -41,12 +49,17 @@ class GameViewModel @Inject constructor(
         val st = _state.value
         val track = st.track ?: return
         val guess = st.currentGuess.uppercase()
+        val titleWithoutSpaces = track.title.titleWithoutSpaces()
 
-        if (guess.length != track.title.length) return
+        if (guess.length != titleWithoutSpaces.length) {
+            Log.w(TAG, "Guess length (${guess.length}) doesn't match title without spaces length (${titleWithoutSpaces.length})")
+            return
+        }
 
         val newGuesses = st.guesses + guess
         val attemptIdx = st.currentAttemptIndex
-        val won = guess.equals(track.title, true)
+
+        val won = guess.equals(titleWithoutSpaces, ignoreCase = true)
         val finished = won || attemptIdx + 1 >= Constants.GUESSES_TOTAL
         val points = pointsTable[attemptIdx]?.takeIf { won }
 
@@ -69,7 +82,7 @@ class GameViewModel @Inject constructor(
     private val pointsTable = mapOf(
         0 to 10, 1 to 9, 2 to 8, 3 to 7, 4 to 6, 5 to 5
     )
-    
+
     private suspend fun addUserPoints(p: Int) {
         val uid = auth.currentUser()?.uid ?: return
         when (val res = users.getUser(uid)) {
