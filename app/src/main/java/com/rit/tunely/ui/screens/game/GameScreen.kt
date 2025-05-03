@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.rit.tunely.data.auth.SpotifyTokenProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,8 +29,7 @@ fun GameScreen(
     val state = vm.state.collectAsState().value
 
     LaunchedEffect(Unit) {
-        val token = SpotifyTokenProvider.getTokenValue()
-        vm.init(token.toString())
+        vm.init()
     }
 
     Scaffold(topBar = { TopAppBar(title = { Text("Guess the Title") }) }) { padding ->

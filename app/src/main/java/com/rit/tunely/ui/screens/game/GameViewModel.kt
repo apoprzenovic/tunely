@@ -2,8 +2,8 @@ package com.rit.tunely.ui.screens.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rit.tunely.data.model.Track
-import com.rit.tunely.data.repository.SpotifyRepository
+import com.rit.tunely.data.repository.ITunesRepository
+import com.rit.tunely.data.state.GameUiState
 import com.rit.tunely.player.AudioPlayer
 import com.rit.tunely.util.Constants
 import com.rit.tunely.util.Resource
@@ -14,26 +14,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class GameUiState(
-    val track: Track? = null,
-    val maskedTitle: String = "",
-    val attemptsLeft: Int = Constants.GUESSES_TOTAL,
-    val currentGuess: String = "",
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
-
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val repo: SpotifyRepository,
+    private val repo: ITunesRepository,
     private val player: AudioPlayer
 ) : ViewModel() {
     private val _state = MutableStateFlow(GameUiState())
     val state: StateFlow<GameUiState> = _state
-    private lateinit var token: String
 
-    fun init(token: String) {
-        this.token = token;
+    fun init() {
         loadTrack()
     }
 
@@ -57,26 +46,44 @@ class GameViewModel @Inject constructor(
         _state.value = _state.value.copy(currentGuess = "")
     }
 
-    private fun loadTrack() = viewModelScope.launch {
-        _state.update { it.copy(isLoading = true, error = null) }
+    fun loadTrack() = viewModelScope.launch {
+        _state.update { it.copy(isLoading = true, error = null, currentGuess = "", maskedTitle = "") }
+        player.stop()
 
-        when (val randomTrack = repo.getRandomTrack()) {
+        when (val resource = repo.getRandomTrackWithPreview()) {
             is Resource.Success -> {
-                val track = randomTrack.data
-                _state.value = GameUiState(
-                    track = track,
-                    maskedTitle = mask(track.title),
-                    attemptsLeft = Constants.GUESSES_TOTAL
-                )
-                track.previewUrl?.let { player.play(it) }
+                val track = resource.data
+                _state.update { currentState ->
+                    currentState.copy(
+                        track = track,
+                        maskedTitle = mask(track.title),
+                        attemptsLeft = Constants.GUESSES_TOTAL,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+
+                track.previewUrl?.let { url ->
+                    player.play(url)
+                } ?: run {
+                    _state.update { it.copy(error = "Track found but preview URL is missing.", isLoading = false) }
+                }
             }
 
-            is Resource.Error -> _state.update { it.copy(error = randomTrack.message) }
-            else -> {}
+            is Resource.Error -> {
+                _state.update { it.copy(error = resource.message, isLoading = false) }
+            }
+
+            Resource.Loading -> {
+                // Handled by initial isLoading = true
+            }
         }
-        _state.update { it.copy(isLoading = false) }
     }
 
+    private fun mask(t: String) = t.uppercase().map { if (it.isLetterOrDigit()) '_' else it }.joinToString(" ")
 
-    private fun mask(t: String) = t.uppercase().map { if (it.isLetter()) '_' else it }.joinToString(" ")
+    override fun onCleared() {
+        super.onCleared()
+        player.release()
+    }
 }
