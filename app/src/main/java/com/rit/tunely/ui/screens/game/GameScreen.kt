@@ -30,6 +30,7 @@ fun GameScreen(
     vm: GameViewModel = hiltViewModel()
 ) {
     val state by vm.state.collectAsState()
+    val isPlayingState by state.isPlaying.collectAsState()
     var hintVisible by remember { mutableStateOf(false) }
     var playing by rememberSaveable { mutableStateOf(false) }
 
@@ -38,7 +39,12 @@ fun GameScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        GameTopBar(onHint = { hintVisible = true })
+        GameTopBar(
+            onHint = { hintVisible = true },
+            isPlaying = isPlayingState,
+            showPlaybackControls = playing && !state.gameFinished && state.track != null,
+            onPlayPauseClick = vm::togglePlayPause
+        )
 
         Spacer(Modifier.height(8.dp))
         HorizontalDivider(color = Color.Gray.copy(alpha = .5f))

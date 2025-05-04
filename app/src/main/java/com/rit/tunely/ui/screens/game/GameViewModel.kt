@@ -13,6 +13,7 @@ import com.rit.tunely.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,7 +26,7 @@ class GameViewModel @Inject constructor(
     private val auth: AuthRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(GameUiState())
+    private val _state = MutableStateFlow(GameUiState(isPlaying = player.isPlaying))
     val state: StateFlow<GameUiState> = _state
 
     private fun String.titleWithoutSpaces() = this.replace(" ", "")
@@ -93,12 +94,12 @@ class GameViewModel @Inject constructor(
     }
 
     fun loadTrack() = viewModelScope.launch {
-        _state.value = GameUiState(isLoading = true)
+        _state.value = GameUiState(isLoading = true, isPlaying = player.isPlaying)
         player.stop()
 
         when (val res = repo.getRandomTrackWithPreview()) {
             is Resource.Success -> res.data.let { track ->
-                _state.value = GameUiState(track = track)
+                _state.value = GameUiState(track = track, isPlaying = player.isPlaying)
                 track.previewUrl?.let(player::play)
                     ?: _state.update { it.copy(error = "Preview URL missing") }
             }
@@ -108,9 +109,20 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    fun togglePlayPause() = viewModelScope.launch {
+        val currentTrack = _state.value.track
+        val isCurrentlyPlaying = player.isPlaying.first()
+
+        if (isCurrentlyPlaying) {
+            player.stop()
+        } else {
+            currentTrack?.previewUrl?.let { player.play(it) }
+        }
+    }
+
     fun resetGame() {
         player.stop()
-        _state.value = GameUiState()
+        _state.value = GameUiState(isPlaying = player.isPlaying)
     }
 
     override fun onCleared() {

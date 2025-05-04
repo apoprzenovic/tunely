@@ -1,6 +1,7 @@
 package com.rit.tunely.data.state
 
 import com.rit.tunely.data.model.Track
+import kotlinx.coroutines.flow.StateFlow
 
 data class GameUiState(
     val track: Track? = null,
@@ -11,5 +12,6 @@ data class GameUiState(
     val error: String? = null,
     val gameFinished: Boolean = false,
     val gameWon: Boolean = false,
-    val pointsEarnedThisRound: Int? = null
+    val pointsEarnedThisRound: Int? = null,
+    val isPlaying: StateFlow<Boolean>
 )
